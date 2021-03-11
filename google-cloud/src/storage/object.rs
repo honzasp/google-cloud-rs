@@ -45,7 +45,7 @@ impl Object {
     pub async fn get(&mut self) -> Result<Vec<u8>, Error> {
         let client = &mut self.client;
         let inner = &client.client;
-        let uri = format!("{}/b/{}/o/{}", Client::ENDPOINT, self.bucket, self.name);
+        let uri = Client::object_uri(&self.bucket, &self.name);
 
         let token = client.token_manager.lock().await.token().await?;
         let request = inner
@@ -63,7 +63,7 @@ impl Object {
     pub async fn delete(self) -> Result<(), Error> {
         let client = self.client;
         let inner = client.client;
-        let uri = format!("{}/b/{}/o/{}", Client::ENDPOINT, self.bucket, self.name);
+        let uri = Client::object_uri(&self.bucket, &self.name);
 
         let token = client.token_manager.lock().await.token().await?;
         let request = inner

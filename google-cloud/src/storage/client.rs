@@ -28,6 +28,7 @@ impl Client {
         "https://www.googleapis.com/auth/cloud-platform",
         "https://www.googleapis.com/auth/devstorage.full_control",
     ];
+
     #[allow(dead_code)]
     pub(crate) fn uri(uri: &str) -> String {
         if uri.starts_with('/') {
@@ -35,6 +36,20 @@ impl Client {
         } else {
             format!("{}/{}", Client::ENDPOINT, uri)
         }
+    }
+
+    pub(crate) fn buckets_uri() -> String {
+        format!("{}/b", Client::ENDPOINT)
+    }
+    pub(crate) fn bucket_uri(bucket_name: &str) -> String {
+        format!("{}/b/{}", Client::ENDPOINT, urlencoding::encode(bucket_name))
+    }
+    pub(crate) fn objects_upload_uri(bucket_name: &str) -> String {
+        format!("{}/b/{}/o", Client::UPLOAD_ENDPOINT, urlencoding::encode(bucket_name))
+    }
+    pub(crate) fn object_uri(bucket_name: &str, object_name: &str) -> String {
+        format!("{}/b/{}/o/{}", Client::ENDPOINT,
+            urlencoding::encode(bucket_name), urlencoding::encode(object_name))
     }
 
     /// Create a new client for the specified project.
@@ -71,7 +86,7 @@ impl Client {
     /// Get a handle to a specific bucket.
     pub async fn bucket(&mut self, name: &str) -> Result<Bucket, Error> {
         let inner = &self.client;
-        let uri = format!("{}/b/{}", Client::ENDPOINT, name);
+        let uri = Client::bucket_uri(name);
 
         let token = self.token_manager.lock().await.token().await?;
         let request = inner
@@ -90,7 +105,7 @@ impl Client {
     /// List all existing buckets of the current project.
     pub async fn buckets(&mut self) -> Result<Vec<Bucket>, Error> {
         let inner = &self.client;
-        let uri = format!("{}/b", Client::ENDPOINT);
+        let uri = Client::buckets_uri();
 
         let token = self.token_manager.lock().await.token().await?;
         let request = inner
@@ -116,7 +131,7 @@ impl Client {
     /// Create a new bucket and get a handle to it.
     pub async fn create_bucket(&mut self, name: &str) -> Result<Bucket, Error> {
         let inner = &self.client;
-        let uri = format!("{}/b", Client::ENDPOINT);
+        let uri = Client::buckets_uri();
 
         let body = json!({
             "kind": "storage#bucket",

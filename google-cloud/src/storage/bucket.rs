@@ -30,7 +30,7 @@ impl Bucket {
     ) -> Result<Object, Error> {
         let client = &mut self.client;
         let inner = &client.client;
-        let uri = format!("{}/b/{}/o", Client::UPLOAD_ENDPOINT, self.name);
+        let uri = Client::objects_upload_uri(&self.name);
 
         let data = data.into();
         let token = client.token_manager.lock().await.token().await?;
@@ -57,7 +57,7 @@ impl Bucket {
     pub async fn object(&mut self, name: &str) -> Result<Object, Error> {
         let client = &mut self.client;
         let inner = &client.client;
-        let uri = format!("{}/b/{}/o/{}", Client::ENDPOINT, self.name, name);
+        let uri = Client::object_uri(&self.name, name);
 
         let token = client.token_manager.lock().await.token().await?;
         let request = inner
@@ -79,7 +79,7 @@ impl Bucket {
     pub async fn delete(self) -> Result<(), Error> {
         let client = self.client;
         let inner = client.client;
-        let uri = format!("{}/b/{}", Client::ENDPOINT, self.name);
+        let uri = Client::bucket_uri(&self.name);
 
         let token = client.token_manager.lock().await.token().await?;
         let request = inner

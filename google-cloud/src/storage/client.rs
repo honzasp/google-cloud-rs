@@ -10,10 +10,10 @@ use crate::storage::api::bucket::{BucketResource, BucketResources};
 use crate::storage::{Bucket, Error};
 
 /// The Cloud Storage client, tied to a specific project.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Client {
     pub(crate) project_name: String,
-    pub(crate) client: Arc<reqwest::Client>,
+    pub(crate) client: reqwest::Client,
     pub(crate) token_manager: Arc<Mutex<TokenManager>>,
 }
 
@@ -59,7 +59,7 @@ impl Client {
             .build()?;
 
         Ok(Client {
-            client: Arc::new(client),
+            client,
             project_name: project_name.into(),
             token_manager: Arc::new(Mutex::new(TokenManager::new(
                 creds,

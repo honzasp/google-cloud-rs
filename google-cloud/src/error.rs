@@ -59,9 +59,6 @@ pub enum AuthError {
     #[error("JSON error: {0}")]
     JSON(#[from] json::Error),
     /// HTTP errors
-    #[error("Hyper error: {0}")]
-    Http(#[from] http::Error),
-    /// Hyper errors
-    #[error("Hyper error: {0}")]
-    Hyper(#[from] hyper::Error),
+    #[error("HTTP error: {0}")]
+    Http(#[from] reqwest::Error),
 }
